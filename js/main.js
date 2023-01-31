@@ -1,7 +1,11 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
+import { Sky } from '../node_modules/three/examples/jsm/objects/Sky.js';
+
 import {map0_data, loadMap} from './map/map.js';
+import {loadWater} from "./map/water.js";
 import Stats from '../node_modules/stats.js/src/Stats.js'
+
 
 
 // variables
@@ -9,6 +13,7 @@ let scene;
 let renderer;
 let clock;
 let controls;
+let water, sun;
 const stats = Stats()
 const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -29,7 +34,6 @@ function init()
 
     clock = new THREE.Clock();
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog( 0xa0a0a0, 10, 200);
     raycaster = new THREE.Raycaster();
 
 
@@ -37,10 +41,11 @@ function init()
     renderer = new THREE.WebGLRenderer({antialias : true, alpha : true});
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
     document.body.appendChild(renderer.domElement) ;
     controls = new OrbitControls( camera, renderer.domElement );
-
-
+    controls.maxPolarAngle = Math.PI * 0.495;
 
 
     //cursor
@@ -62,6 +67,48 @@ function init()
     console.log(directionalLight)
 
     loadMap(mapdata, scene, clickableObjs);
+
+    water = loadWater(scene);
+
+    sun = new THREE.Vector3();
+
+    const sky = new Sky();
+    sky.scale.setScalar( 10000 );
+    scene.add( sky );
+
+    const skyUniforms = sky.material.uniforms;
+
+    skyUniforms[ 'turbidity' ].value = 10;
+    skyUniforms[ 'rayleigh' ].value = 2;
+    skyUniforms[ 'mieCoefficient' ].value = 0.005;
+    skyUniforms[ 'mieDirectionalG' ].value = 0.8;
+
+    const pmremGenerator = new THREE.PMREMGenerator( renderer );
+    let renderTarget;
+
+    const parameters = {
+        elevation: 2,
+        azimuth: 180
+    };
+    function updateSun() {
+
+        const phi = THREE.MathUtils.degToRad( 90 - parameters.elevation );
+        const theta = THREE.MathUtils.degToRad( parameters.azimuth );
+
+        sun.setFromSphericalCoords( 1, phi, theta );
+
+        sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+        water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
+
+        if ( renderTarget !== undefined ) renderTarget.dispose();
+
+        renderTarget = pmremGenerator.fromScene( sky );
+
+        scene.environment = renderTarget.texture;
+
+    }
+
+    updateSun();
 
     const button = document.getElementById("start");
 
@@ -86,6 +133,8 @@ function render()
 {
     renderer.render(scene, camera);
     requestAnimationFrame(render);
+    water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
+
     stats.update()
     controls.update();
 
@@ -155,7 +204,7 @@ function countNeighbours(posx,posy,mapdata) {
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             // Check if the current neighbor is within the grid boundaries
-            if (posy + i >= 0 && posy + i < 20 && posx + j >= 0 && posx + j < 20) {
+            if (posy + i >= 0 && posy + i < 60 && posx + j >= 0 && posx + j < 60) {
                 Neighbours += mapdata.data[posy + i][posx + j]['etat'];
             }
         }

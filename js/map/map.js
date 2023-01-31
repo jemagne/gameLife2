@@ -30,9 +30,9 @@ fbxLoader.load(
 
 export function map0_data() {
     let data = [];
-    for (let y = 0; y < 20; y++) {
+    for (let y = 0; y < 60; y++) {
         let xrow = []
-        for (let x = 0; x < 20; x++) {
+        for (let x = 0; x < 60; x++) {
             let bloc = [];
             bloc['etat'] =  0;
             bloc['object'] = undefined;
