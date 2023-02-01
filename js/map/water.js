@@ -9,7 +9,7 @@ export function loadWater(scene) {
         {
             textureWidth: 512,
             textureHeight: 512,
-            waterNormals: new THREE.TextureLoader().load( '../../assets/waternormals.jpeg', function ( texture ) {
+            waterNormals: new THREE.TextureLoader().load( './assets/waternormals.jpeg', function ( texture ) {
 
                 texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 

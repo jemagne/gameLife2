@@ -5,29 +5,31 @@ import { Sky } from '../node_modules/three/examples/jsm/objects/Sky.js';
 import {map0_data, loadMap} from './map/map.js';
 import {loadWater} from "./map/water.js";
 import Stats from '../node_modules/stats.js/src/Stats.js'
+import {island} from "./map/island.js";
 
 
 
-// variables
+// letiables
 let scene;
 let renderer;
 let clock;
 let controls;
 let water, sun;
 const stats = Stats()
-const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 40000 );
 
 
-var raycaster;
-var mouse = new THREE.Vector2();
-var clickableObjs = new Array();
-var cursor_cube = undefined;
+let raycaster;
+let mouse = new THREE.Vector2();
+let clickableObjs = new Array();
+let cursor_cube = undefined;
 let map = map0_data();
 let newmapLoad = []
-for (var i = 0; i < map.data.length; i++)
+for (let i = 0; i < map.data.length; i++)
     newmapLoad[i] = map.data[i].slice();
 let mapdata = {'data':newmapLoad.slice()} ;
-
+// for convenience
+var pi = Math.PI;
 
 function init()
 {
@@ -58,19 +60,27 @@ function init()
     document.querySelector('canvas').addEventListener('pointerdown', onMouseDown, false);
 
     //light
-    var ambientLight = new THREE.AmbientLight('rgb(243,158,36)', 0.6);
+    let ambientLight = new THREE.AmbientLight('rgb(243,158,36)', 0.6);
     scene.add(ambientLight);
 
-    var directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
     directionalLight.position.set(1, 0.9, 0.4);
     scene.add(directionalLight);
-    console.log(directionalLight)
 
-    loadMap(mapdata, scene, clickableObjs);
+   /* loadMap(mapdata, scene, clickableObjs);*/
 
     water = loadWater(scene);
 
     sun = new THREE.Vector3();
+
+    island(scene);
+    //materials
+    var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
+    let mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
+    let mat_dark = new THREE.MeshLambertMaterial({ color: 0x5a6e6c });
+    let mat_brown = new THREE.MeshLambertMaterial({ color: 0xa3785f });
+    let mat_stone = new THREE.MeshLambertMaterial({ color: 0x9eaeac });
+
 
     const sky = new Sky();
     sky.scale.setScalar( 10000 );
@@ -117,11 +127,14 @@ function init()
     });
     document.getElementById('stats').appendChild(stats.dom)
     // loop
-    camera.position.y = 5;
+    camera.position.y = 500;
     camera.position.z = 25;
-    camera.position.x = 5
+    camera.position.x = 600;
     camera.lookAt(0, 0, 0);
     controls.update();
+    setInterval( function(){
+         water.material.uniforms[ 'time' ].value += 1/ 60.0;
+     }, 25);
 
     render();
 
@@ -131,12 +144,11 @@ function init()
 
 function render()
 {
-    renderer.render(scene, camera);
     requestAnimationFrame(render);
-    water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
 
     stats.update()
     controls.update();
+    renderer.render(scene, camera);
 
 }
 
@@ -156,7 +168,7 @@ function onMouseDown(event)
     if(intersects.length > 0)
     {
         //if ()
-        var selectedBloc = intersects[0].object;
+        let selectedBloc = intersects[0].object;
         if (mapdata.data[selectedBloc.gridPos.y][selectedBloc.gridPos.x]['etat'] === 0 ) {
             mapdata.data[selectedBloc.gridPos.y][selectedBloc.gridPos.x]['etat'] = 1;
             selectedBloc.material.color.setHex( 0x333333 );
@@ -204,7 +216,7 @@ function countNeighbours(posx,posy,mapdata) {
     for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
             // Check if the current neighbor is within the grid boundaries
-            if (posy + i >= 0 && posy + i < 60 && posx + j >= 0 && posx + j < 60) {
+            if (posy + i >= 0 && posy + i < mapdata.data[0].length && posx + j >= 0 && posx + j < mapdata.data[0].length) {
                 Neighbours += mapdata.data[posy + i][posx + j]['etat'];
             }
         }
@@ -215,4 +227,3 @@ function countNeighbours(posx,posy,mapdata) {
 
 init();
 
-window.requestAnimationFrame(render);
