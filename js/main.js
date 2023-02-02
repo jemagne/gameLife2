@@ -1,6 +1,7 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
 import { Sky } from '../node_modules/three/examples/jsm/objects/Sky.js';
+import { FBXLoader } from '../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
 import {map0_data, loadMap} from './map/map.js';
 import {loadWater} from "./map/water.js";
@@ -74,6 +75,8 @@ function init()
     sun = new THREE.Vector3();
 
     island(scene);
+
+
     //materials
     var mat_grey = new THREE.MeshLambertMaterial({ color: 0xf3f2f7 });
     let mat_yellow = new THREE.MeshLambertMaterial({ color: 0xfeb42b });
