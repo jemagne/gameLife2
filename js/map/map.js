@@ -1,5 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { FBXLoader } from '../../node_modules/three/examples/jsm/loaders/FBXLoader.js';
+import { OBJLoader } from '../../node_modules/three/examples/jsm/loaders/OBJLoader.js';
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -29,42 +30,51 @@ fbxLoader.load(
 
 export function map0_data() {
     let data = [];
-    for (let y = 0; y < 50; y++) {
+    for (let y = 0; y < 25; y++) {
         let xrow = []
-        for (let x = 0; x < 50; x++) {
+        for (let x = 0; x < 25; x++) {
             let bloc = [];
-            bloc['etat'] =  0;
+            bloc['etat'] =  getRandomInt(2);
             bloc['object'] = undefined;
             bloc['house'] = undefined;
             xrow.push(bloc);
         }
         data.push(xrow)
     }
+    console.log(data);
     return {'data': data};
 }
 
 export function loadMap(mapdata, scene, clickableObjs) {
-    console.log(HouseLoad)
     var size_Y = mapdata.data.length;
     var size_X = mapdata.data[0].length;
 
-    const geometry = new THREE.BoxGeometry(3, 1, 3);
+    const geometry = new THREE.BoxGeometry(8, 2, 8);
 
     for (var x = 0; x < size_X; x++) {
         for (var y = 0; y < size_Y; y++) {
-             var posx = (x*3) - (size_X/2)*3;
-             var posy = (y*3) - (size_Y/2)*3;
+             var posx = (x*8) - (size_X/2)*8;
+             var posy = (y*8) - (size_Y/2)*8;
             /*var posx = x;
             var posy = y;*/
             let colorFloor = 'rgb(54,169,139)';
 
 
             if (mapdata.data[y][x]['object'] === undefined) {
-                let material = new THREE.MeshLambertMaterial({color:	colorFloor});
+                let color = undefined;
+
+                if ( mapdata.data[y][x]['etat'] === 1) {
+                   color = 0x2c3e50;
+
+                } else {
+                    color = colorFloor;
+                }
+                console.log(color);
+                let material = new THREE.MeshLambertMaterial({color:	color});
                 let cube = new THREE.Mesh(geometry, material);
                 cube.name = "floor";
                 clickableObjs.push(cube);
-                cube.position.set(posx, 20, posy);
+                cube.position.set(posx, 40, posy);
                 cube.gridPos =  {'x':x, 'y':y};
                 scene.add(cube);
 
@@ -76,13 +86,13 @@ export function loadMap(mapdata, scene, clickableObjs) {
                     if (mapdata.data[y][x]['house'] === undefined) {
                         let houseClone = HouseLoad.clone()
                         houseClone.position.copy(mapdata.data[y][x]['object'].position)
-                        houseClone.position.y = 20.5;
-                        houseClone.scale.multiplyScalar(0.1)
+                        houseClone.position.y = 41.2;
+                        //houseClone.scale.multiplyScalar(0.5)
                         scene.add(houseClone);
                         mapdata.data[y][x]['house'] = houseClone;
-                        houseClone.scale.setY(0.03);
-                        houseClone.scale.setX(0.03);
-                        houseClone.scale.setZ(0.03);
+                        houseClone.scale.setY(0.1);
+                        houseClone.scale.setX(0.1);
+                        houseClone.scale.setZ(0.1);
                     } else {
                         mapdata.data[y][x]['house'].visible = true;
                     }

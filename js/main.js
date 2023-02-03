@@ -38,8 +38,8 @@ function init()
     clock = new THREE.Clock();
     scene = new THREE.Scene();
     raycaster = new THREE.Raycaster();
-
-
+    const axesHelper = new THREE.AxesHelper( 500 );
+scene.add( axesHelper );
     //renderer
     renderer = new THREE.WebGLRenderer({antialias : true, alpha : true});
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -50,12 +50,6 @@ function init()
     controls = new OrbitControls( camera, renderer.domElement );
     controls.maxPolarAngle = Math.PI * 0.495;
 
-
-    //cursor
-    const corsor_material = new THREE.MeshLambertMaterial({transparent : true, opacity : 0 , color : 0xc0392b});
-    const cursor_geometry = new THREE.BoxGeometry(0.5, 4, 0.5);
-    cursor_cube = new THREE.Mesh(cursor_geometry, corsor_material);
-    scene.add(cursor_cube);
 
     //event
     document.querySelector('canvas').addEventListener('pointerdown', onMouseDown, false);
@@ -68,7 +62,7 @@ function init()
     directionalLight.position.set(1, 0.9, 0.4);
     scene.add(directionalLight);
 
-   /* loadMap(mapdata, scene, clickableObjs);*/
+    loadMap(mapdata, scene, clickableObjs);
 
     water = loadWater(scene);
 
@@ -130,9 +124,9 @@ function init()
     });
     document.getElementById('stats').appendChild(stats.dom)
     // loop
-    camera.position.y = 500;
+    camera.position.y = 200;
     camera.position.z = 25;
-    camera.position.x = 600;
+    camera.position.x = 200;
     camera.lookAt(0, 0, 0);
     controls.update();
     setInterval( function(){

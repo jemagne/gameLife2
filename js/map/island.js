@@ -22,15 +22,16 @@ export function island(scene) {
     layers[2].scale.set(0.8, 1, 0.91);
     layers[2].rotation.y = ((2 * pi) / 9) * 0.3;
 
+    console.log(layers[2])
+
     ground.scale.set(50,50,50);
     scene.add(ground);
 
     //island(scene);
-    let trees = new THREE.Object3D();
     const fbxLoader = new FBXLoader()
     var raycaster = new THREE.Raycaster();
-    fbxLoader.load('./assets/model/Tree_Spruce_small_02.fbx', function(treeModel) {
-        let trees = new THREE.Object3D();
+    fbxLoader.load('./assets/model/FirTree01.fbx', function(treeModel) {
+        /*let trees = new THREE.Object3D();
 
         for (let i = 0; i < 30; i++) {
             var position = new THREE.Vector3(
@@ -39,53 +40,42 @@ export function island(scene) {
                 Math.random() * 200 - 100
             );
 
-            // Affichage des rayons du raycaster
-            var lineGeometry = new THREE.BufferGeometry();
-            var lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
-            var linePositions = new Float32Array([position.x, position.y, position.z, position.x, -1, position.z]);
-            lineGeometry.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-            var line = new THREE.Line(lineGeometry, lineMaterial);
-
-            scene.add( line );
-
-            raycaster.set(position, new THREE.Vector3(0, -1, 0));
-            let intersects = raycaster.intersectObject(layers[2]);
+          
 
 
             if (intersects.length > 0) {
                 console.log(intersects[0])
                 let point = intersects[0].point;
-                let tree = treeModel.clone();
-                tree.scale.set(0.1, 0.1, 0.1);
-                tree.position.copy(point.x,0.5,point.z);
-                trees.add(tree);
+                
             }
+        }*/
+     
+        // Créez des petits cubes
+        
+        for (var i = 0; i < 80; i++) {
+            let tree = treeModel.clone();
+                tree.scale.set(0.001, 0.001, 0.001);
+                let rand = Math.random();
+                let etatx = 1;
+                if (rand < 0.5) {
+                    etatx = -1
+                }
+                let randy = Math.random();
+
+                let etaty = 1;
+                if (randy < 0.5) {
+                    etaty = -1
+                }
+                tree.position.set(
+                    (Math.random()*1 - 1)*2 + 6 * etatx, 
+                    0.1,
+                    (Math.random()*1 - 1)*3 + 6 * etaty)
+                
+                layers[2].add(tree);
+         
         }
 
-        layers[2].add(trees);
+        //layers[2].add(trees);
     });
-   /* for (let i = 0; i < 30; i++) {
-        var tree;
-        var position = new THREE.Vector3(
-            Math.random() * 2 - 1,
-            5,
-            Math.random() * 2 - 1
-        );
-        console.log(position)
-        raycaster.set( position, new THREE.Vector3( 0, -1, 0 ) );
-        var intersects = raycaster.intersectObject( layers[2] );
-        console.log(layers[2],intersects)
 
-        if ( intersects.length > 0 ) {
-            var point = intersects[ 0 ].point;
-            fbxLoader.load( './assets/model/Tree_Spruce_small_02.fbx', function ( object ) {
-                tree = object;
-                tree.scale.set(0.1, 0.1, 0.1);
-                tree.position.copy(point);
-                trees.add( tree );
-            } );
-        }
-    }*/
-
-    layers[2].add( trees );
 }
