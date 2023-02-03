@@ -41,7 +41,6 @@ export function map0_data() {
         }
         data.push(xrow)
     }
-    console.log(data);
     return {'data': data};
 }
 
@@ -62,14 +61,12 @@ export function loadMap(mapdata, scene, clickableObjs) {
 
             if (mapdata.data[y][x]['object'] === undefined) {
                 let color = undefined;
-
                 if ( mapdata.data[y][x]['etat'] === 1) {
                    color = 0x2c3e50;
 
                 } else {
                     color = colorFloor;
                 }
-                console.log(color);
                 let material = new THREE.MeshLambertMaterial({color:	color});
                 let cube = new THREE.Mesh(geometry, material);
                 cube.name = "floor";
@@ -87,7 +84,6 @@ export function loadMap(mapdata, scene, clickableObjs) {
                         let houseClone = HouseLoad.clone()
                         houseClone.position.copy(mapdata.data[y][x]['object'].position)
                         houseClone.position.y = 41.2;
-                        //houseClone.scale.multiplyScalar(0.5)
                         scene.add(houseClone);
                         mapdata.data[y][x]['house'] = houseClone;
                         houseClone.scale.setY(0.1);

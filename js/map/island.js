@@ -2,7 +2,7 @@ import * as THREE from '../../node_modules/three/build/three.module.js';
 import { FBXLoader } from '../../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
 export function island(scene) {
-    var pi = Math.PI;
+    let pi = Math.PI;
 
     let mat_orange = new THREE.MeshLambertMaterial({ color: 0xff8c75 });
     //-------------------------------------ground-------------------------------------
@@ -22,60 +22,48 @@ export function island(scene) {
     layers[2].scale.set(0.8, 1, 0.91);
     layers[2].rotation.y = ((2 * pi) / 9) * 0.3;
 
-    console.log(layers[2])
-
     ground.scale.set(50,50,50);
     scene.add(ground);
 
     //island(scene);
     const fbxLoader = new FBXLoader()
-    var raycaster = new THREE.Raycaster();
+    let trees = [];
+
     fbxLoader.load('./assets/model/FirTree01.fbx', function(treeModel) {
-        /*let trees = new THREE.Object3D();
-
-        for (let i = 0; i < 30; i++) {
-            var position = new THREE.Vector3(
-                Math.random() * 200 - 100,
-                50,
-                Math.random() * 200 - 100
-            );
-
-          
-
-
-            if (intersects.length > 0) {
-                console.log(intersects[0])
-                let point = intersects[0].point;
-                
-            }
-        }*/
-     
+        let radius = layers[2].geometry.parameters.radiusTop - 10.3;
+        let segments = 100;
         // Créez des petits cubes
-        
-        for (var i = 0; i < 80; i++) {
-            let tree = treeModel.clone();
-                tree.scale.set(0.001, 0.001, 0.001);
-                let rand = Math.random();
-                let etatx = 1;
-                if (rand < 0.5) {
-                    etatx = -1
-                }
-                let randy = Math.random();
+        let Model = treeModel.clone();
 
-                let etaty = 1;
-                if (randy < 0.5) {
-                    etaty = -1
-                }
-                tree.position.set(
-                    (Math.random()*1 - 1)*2 + 6 * etatx, 
-                    0.1,
-                    (Math.random()*1 - 1)*3 + 6 * etaty)
-                
+        for (let i = 0; i < segments; i++) {
+            console.log(treeModel);
+            let tree = generateTree(Model, trees, radius, 0.12);
+            if (tree !== undefined) {
+                trees.push(tree);
                 layers[2].add(tree);
-         
+            }
         }
-
         //layers[2].add(trees);
     });
+
+}
+function generateTree(newTreeModel, trees, radius, height) {
+    let newTree = undefined
+    if (newTreeModel !== undefined) {
+        let newTree = newTreeModel.clone();
+        newTree.scale.set(0.001, 0.001, 0.001);
+        let angle = (Math.random() * Math.PI * 2);
+        newTree.position.x = radius * Math.cos(angle) + (Math.random() * 1 - 0.5);
+        newTree.position.y = height;
+        newTree.position.z = radius * Math.sin(angle) + (Math.random() * 1 - 0.5);
+        let minDistance = 0.5;
+        for (let i = 0; i < trees.length; i++) {
+            let distance = newTree.position.distanceTo(trees[i].position);
+            if (distance < minDistance) {
+                return generateTree(newTreeModel, trees, radius, height);
+            }
+        }
+        return newTree;
+    }
 
 }
