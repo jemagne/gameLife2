@@ -7,7 +7,7 @@ import {map0_data, loadMap} from './map/map.js';
 import {loadWater} from "./map/water.js";
 import Stats from '../node_modules/stats.js/src/Stats.js'
 import {island} from "./map/island.js";
-
+import {loadCloud} from "./map/cloud.js";
 
 
 // letiables
@@ -15,7 +15,7 @@ let scene;
 let renderer;
 let clock;
 let controls;
-let water, sun;
+let water, sun, clouds;
 const stats = Stats()
 const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 40000 );
 
@@ -26,6 +26,7 @@ let clickableObjs = new Array();
 let cursor_cube = undefined;
 let map = map0_data();
 let newmapLoad = []
+let start = false;
 for (let i = 0; i < map.data.length; i++)
     newmapLoad[i] = map.data[i].slice();
 let mapdata = {'data':newmapLoad.slice()} ;
@@ -65,7 +66,7 @@ scene.add( axesHelper );
     loadMap(mapdata, scene, clickableObjs);
 
     water = loadWater(scene);
-
+    clouds = loadCloud(scene);
     sun = new THREE.Vector3();
 
     island(scene);
@@ -117,9 +118,17 @@ scene.add( axesHelper );
 
     updateSun();
 
-    const button = document.getElementById("start");
+    const buttonStart = document.getElementById("start");
+    const buttonStop = document.getElementById("stop");
+    const buttonNext = document.getElementById("next");
 
-    button.addEventListener('click', event => {
+    buttonStart.addEventListener('click', event => {
+        start = true;
+    });
+    buttonStop.addEventListener('click', event => {
+        start = false;
+    });
+    buttonNext.addEventListener('click', event => {
         round(mapdata);
     });
     document.getElementById('stats').appendChild(stats.dom)
@@ -129,10 +138,16 @@ scene.add( axesHelper );
     camera.position.x = 200;
     camera.lookAt(0, 0, 0);
     controls.update();
+
     setInterval( function(){
          water.material.uniforms[ 'time' ].value += 1/ 60.0;
      }, 25);
 
+    setInterval( function(){
+        if (start === true ) {
+            round(mapdata);
+        }
+    }, 1000);
     render();
 
 }
@@ -141,6 +156,12 @@ scene.add( axesHelper );
 
 function render()
 {
+    for (var i = 0; i < clouds.length; i++) {
+        clouds[i].position.x += 0.1;
+        if (clouds[i].position.x > 800) {
+            clouds[i].position.x = -800;
+        }
+    }
     requestAnimationFrame(render);
 
     stats.update()

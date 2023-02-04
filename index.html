@@ -55,18 +55,29 @@
 		</script>
     <script  type="module" src="./js/main.js"></script>
     <style>
-        #start {
-            position: absolute;
-            top: 50px;
-            left  : 10px;
+        body {
+            margin: 0;
         }
+        .btn-interaction {
+            position: absolute;
+            right: 10px;
+            top: 50px;
+            display: flex;
+            flex-direction: column;
+        }
+
     </style>
 </head>
 
 <body>
 
+<div class="btn-interaction">
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="next">start</button>
+</div>
 <!-- CREATE MENU -->
-<button id="start">Start</button>
+
 <div id="stats"></div>
 
 </body>

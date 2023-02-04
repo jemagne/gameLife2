@@ -36,7 +36,6 @@ export function island(scene) {
         let Model = treeModel.clone();
 
         for (let i = 0; i < segments; i++) {
-            console.log(treeModel);
             let tree = generateTree(Model, trees, radius, 0.12);
             if (tree !== undefined) {
                 trees.push(tree);
