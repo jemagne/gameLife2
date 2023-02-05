@@ -1,5 +1,6 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 import { OrbitControls } from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
+import { AmmoPhysics  } from "../node_modules/three/examples/jsm/physics/AmmoPhysics.js";
 import { Sky } from '../node_modules/three/examples/jsm/objects/Sky.js';
 import { FBXLoader } from '../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
@@ -20,7 +21,7 @@ const stats = Stats()
 const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 40000 );
 
 
-let raycaster;
+let raycaster, physics;
 let mouse = new THREE.Vector2();
 let clickableObjs = new Array();
 let cursor_cube = undefined;
@@ -33,19 +34,23 @@ let mapdata = {'data':newmapLoad.slice()} ;
 // for convenience
 var pi = Math.PI;
 
+
 function init()
 {
+
+    physics = await AmmoPhysics();
 
     clock = new THREE.Clock();
     scene = new THREE.Scene();
     raycaster = new THREE.Raycaster();
     const axesHelper = new THREE.AxesHelper( 500 );
-scene.add( axesHelper );
+    scene.add( axesHelper );
     //renderer
     renderer = new THREE.WebGLRenderer({antialias : true, alpha : true});
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true;
 
     document.body.appendChild(renderer.domElement) ;
     controls = new OrbitControls( camera, renderer.domElement );
@@ -69,7 +74,16 @@ scene.add( axesHelper );
     clouds = loadCloud(scene);
     sun = new THREE.Vector3();
 
-    island(scene);
+    let islandGround  = island(scene,physics);
+    physics.addMesh(islandGround);
+
+
+    // Créer l'objet déplaçable
+    var cubeGeometry = new THREE.BoxGeometry(10, 10, 10);
+    var cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.position.y = 35;
+    scene.add(cube);
 
 
     //materials
@@ -148,6 +162,9 @@ scene.add( axesHelper );
             round(mapdata);
         }
     }, 1000);
+
+
+
     render();
 
 }

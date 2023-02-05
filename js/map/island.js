@@ -1,7 +1,7 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { FBXLoader } from '../../node_modules/three/examples/jsm/loaders/FBXLoader.js';
 
-export function island(scene) {
+export function island(scene, physics) {
     let pi = Math.PI;
 
     let mat_orange = new THREE.MeshLambertMaterial({ color: 0xff8c75 });
@@ -21,7 +21,6 @@ export function island(scene) {
     layers[1].rotation.y = ((2 * pi) / 9) * 0.6;
     layers[2].scale.set(0.8, 1, 0.91);
     layers[2].rotation.y = ((2 * pi) / 9) * 0.3;
-
     ground.scale.set(50,50,50);
     scene.add(ground);
 
@@ -44,7 +43,7 @@ export function island(scene) {
         }
         //layers[2].add(trees);
     });
-
+    return ground;
 }
 function generateTree(newTreeModel, trees, radius, height) {
     let newTree = undefined
