@@ -43,7 +43,7 @@ export function island(scene, physics) {
         }
         //layers[2].add(trees);
     });
-    return ground;
+    return layers[2];
 }
 function generateTree(newTreeModel, trees, radius, height) {
     let newTree = undefined
